@@ -9,13 +9,19 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+)
 
-	"github.com/spf13/viper"
+const (
+	host         = "http://localhost"
+	path         = "files"
+	apiversion   = "v1"
+	port         = 80
+	maxfilesizeM = 50
 )
 
 // Get a common url and path for http request.
 func getRequestURI() string {
-	return fmt.Sprintf("%s:%d/%s/%s", viper.GetString("server.host"), viper.GetInt("server.port"), viper.GetString("server.apiversion"), viper.GetString("server.path"))
+	return fmt.Sprintf("%s:%d/%s/%s", host, port, apiversion, path)
 }
 
 func request(method, url string, body io.Reader, headers map[string]string) (resBody []byte, statusCode int, err error) {
@@ -120,7 +126,7 @@ func UploadFile(filePath string) {
 	case http.StatusForbidden:
 		fmt.Println("File with the same name already exists in the storage. You can rename the file and try to upload again.")
 	case http.StatusRequestEntityTooLarge:
-		fmt.Printf("File s too large. Allowed file size is %dM.\n", viper.GetInt("server.maxfilesizeM"))
+		fmt.Printf("File is too large. Allowed file size is %dM.\n", maxfilesizeM)
 	case http.StatusCreated:
 		fmt.Println("file uploaded successfully.")
 	default:
